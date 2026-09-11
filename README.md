@@ -1,135 +1,104 @@
 <img width="1280" height="640" alt="git (1)" src="https://github.com/user-attachments/assets/8920b256-2ba8-4988-b824-5351134eb4bd" />
 
-# 🌀 UselessOS 🎯
+# UselessOS 🎯
 
-> **The ultimate web-based desktop experience designed to be gloriously unproductive.**
-
-UselessOS is a full-featured, satirical, interactive Web Operating System built with **React 19**, **Vite**, **Three.js**, and **TailwindCSS v4**. Packed with hilarious meme applications, interactive 3D elements, retro desktop window management, and unexpected chaotic behavior.
-
----
-
-## 🎯 Basic Details
-
-### Team Name: UselessOS Team
+## Basic Details
+### Team Name: Useless Devs
 
 ### Team Members
-- **Team Lead**: VISAKH B
-- member   :AKHIL N
+- Team Lead: VISAKH B - NJCET
+- Member 2: AKHIL N - NJCET
 
 ### Project Description
-UselessOS is a web-based desktop environment packed with absurd, funny, and satirical applications inspired by Indian/Malayalam pop culture, tech tropes, and anti-productivity humor.
+UselessOS is a full-featured, satirical, interactive Web Operating System built with React 19, Vite, Three.js, and TailwindCSS v4. Packed with hilarious meme applications, interactive 3D elements, retro desktop window management, Hand Gesture AI Bird Hunt, and unexpected chaotic behavior.
 
 ### The Problem (that doesn't exist)
-Modern operating systems are too efficient, productive, and smooth. Users lack an operating system specifically crafted to waste time, confuse users, and deliver useless meme interactions.
+Modern operating systems are too efficient, productive, fast, and smooth. Users lack an operating system specifically engineered to waste time, confuse users, deliver Malayalam pop-culture memes, and trigger unexpected screen chaos.
 
 ### The Solution (that nobody asked for)
-UselessOS! An operating system filled with zero-utility applications like virtual uncle calls, fake horoscopes, a charger finder for when your laptop is already plugged in, a dramatic computer cleaner for non-existent junk, and an AI assistant that refuses to help.
+UselessOS! An operating system filled with zero-utility applications like virtual uncle advice calls, fake horoscopes, an AI charger finder when your laptop is already plugged in, a dramatic computer cleaner for non-existent junk, webcam AI hand gesture bird hunting, and an unhelpful AI assistant.
 
----
+## Technical Details
+### Technologies/Components Used
+For Software:
+- Languages: JavaScript (ES6+), HTML5, CSS3
+- Frameworks: React 19, Vite, Express (Node.js)
+- Libraries: Three.js, MediaPipe Hands (@mediapipe/hands), TailwindCSS v4, Lucide React, Cors, Dotenv
+- Tools: npm, git, VS Code
 
-## ✨ Features
+For Hardware:
+- Webcam (Required for Hand Gesture AI Bird Hunt)
+- Standard Computer / Laptop with Keyboard & Mouse
 
-- 💻 **Complete Desktop UI**: Authentic desktop interface with draggable/resizable windows, start menu, taskbar, system tray, battery indicator, and notification center.
-- 🚀 **Boot & Shutdown Sequences**: Realistic OS startup and shutdown experiences.
-- 🌿 **3D Interactive Nature Canvas**: Real-time 3D ambient environment powered by **Three.js**.
-- 🎨 **Dynamic Themes & Personalization**: Wallpapers, theme controls, and customizable desktop settings.
-- ⚡ **Chaos Engine**: Toggleable system chaos modes, glitches, and quirky easter eggs.
+### Implementation
+For Software:
 
----
-
-## 📱 Included Applications
-
-UselessOS comes pre-installed with a wide suite of essential (and non-essential) applications:
-
-| Application | Description |
-| :--- | :--- |
-| 📞 **Ammavan Call App** | Receive incoming advice and wisdom from your virtual neighborhood uncle. |
-| 🔮 **AstroTalk App** | Daily horoscopes and astrological readings with zero practical value. |
-| ☕ **Chaaya App** | Virtual tea brewing simulation for your tech breaks. |
-| ⚡ **Chaos Mode** | Induce chaotic window shaking, glitch effects, and screen mayhem. |
-| 🧠 **Common Sense Test** | An interactive quiz testing your tolerance for absurdity. |
-| 🧹 **Computer Cleaner** | Cleans non-existent temporary files with maximum visual flair. |
-| 🔌 **Find My Charger** | Search for your laptop charger that is already plugged in. |
-| 🌧️ **Rain & Night Sky** | Ambient relaxation tools for stargazing and soundscapes. |
-| 🤖 **Useless AI** | An AI chatbot specifically fine-tuned to give hilariously unhelpful answers. |
-| 🎭 **Troll Center & Character** | Meme collections and character interactions inspired by pop culture. |
-| 🦅 **Bird Hunt** | AI hand-gesture tracked bird shooting game using webcam index fingertip aiming and pinch firing. |
-| 📁 **File Manager & Browser** | Mock file browser and web surfer with built-in joke content. |
-| ⚙️ **Settings & Video Player** | OS customization controls and video playback integration. |
-
----
-
-## 🛠️ Technical Details
-
-### Technologies Used
-
-- **Frontend Framework**: [React 19](https://react.dev/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **3D Graphics**: [Three.js](https://threejs.org/)
-- **Styling**: [TailwindCSS v4](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Backend (Optional API)**: [Node.js](https://nodejs.org/) & [Express](https://expressjs.com/)
-
----
-
-## 🚀 Implementation & Getting Started
-
-### Prerequisites
-
-Ensure you have **Node.js** (v18 or higher recommended) installed on your system.
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/akhilnjcet/uselessos.git
-   cd uselessos
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-4. Open your browser and navigate to `http://localhost:5173` to launch UselessOS.
-
-### (Optional) Backend Server
-
-To run the Express backend server:
+# Installation
 ```bash
+git clone https://github.com/akhilnjcet/uselessos.git
+cd uselessos
+npm install
+```
+
+# Run
+```bash
+# Start Development Server
+npm run dev
+
+# (Optional) Start Express Backend API
 node server.js
 ```
 
+### Project Documentation
+For Software:
+
+# Screenshots (Add at least 3)
+![Screenshot1](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/hero.png)
+*UselessOS Desktop Environment with Draggable Windows & 3D Ambient Canvas*
+
+![Screenshot2](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/wallpaper.jpg)
+*Custom Wallpapers & Malayalam Meme Applications*
+
+![Screenshot3](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/favicon.svg)
+*UselessOS System Icon & Interface Assets*
+
+# Diagrams
+![Workflow](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/icons.svg)
+*UselessOS System Architecture & Context Flow*
+
+For Hardware:
+
+# Schematic & Circuit
+![Circuit](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/icons.svg)
+*Webcam Video Stream -> MediaPipe Hand Tracking -> Canvas Render Loop*
+
+![Schematic](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/icons.svg)
+*Gesture Index Aiming & Pinch Detection Trigger Logic*
+
+# Build Photos
+![Components](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/icons.svg)
+*Hardware components used: PC / Laptop with HD Webcam*
+
+![Build](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/icons.svg)
+*Software Build & Vite Client Environment bundling*
+
+![Final](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/icons.svg)
+*Final UselessOS Web App running live on desktop browser*
+
+### Project Demo
+# Video
+[https://github.com/akhilnjcet/uselessos](https://github.com/akhilnjcet/uselessos)
+*Demonstrates desktop environment, comedy applications, webcam AI hand tracking, and 3D nature background*
+
+# Additional Demos
+[https://github.com/akhilnjcet/uselessos](https://github.com/akhilnjcet/uselessos)
+
+## Team Contributions
+- VISAKH B: Project architecture, window management, desktop UI components & meme app design.
+- AKHIL N: AI Hand Gesture Bird Hunt integration, Three.js 3D environment, audio synthesis & git deployment.
+
 ---
-
-## 📁 Project Structure
-
-```text
-uselessos/
-├── public/              # Static assets and media
-├── src/
-│   ├── assets/          # Sounds, wallpapers, images
-│   ├── components/      # Desktop UI, Taskbar, Window controls
-│   │   └── apps/        # Application modules (AstroTalk, Chaaya, UselessAI, etc.)
-│   ├── config/          # OS configuration and app definitions
-│   ├── context/         # React Context for OS state management
-│   ├── utils/           # Helper utilities and audio managers
-│   ├── App.jsx          # Root OS component
-│   └── main.jsx         # Application entry point
-├── server.js            # Express API backend server
-├── vite.config.js       # Vite configuration
-└── package.json         # Dependencies and scripts
-```
-
----
-
 Made with ❤️ at TinkerHub Useless Projects 
 
 ![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
 ![Static Badge](https://img.shields.io/badge/UselessProjects--26-26?link=https%3A%2F%2Ftinkerhub.org%2Fevents%2F1M8ORET9A1%2Fuseless-projects-3.0)
-
