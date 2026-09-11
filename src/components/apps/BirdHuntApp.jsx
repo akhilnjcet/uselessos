@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Crosshair, Camera as CameraIcon, RefreshCw, Volume2 } from 'lucide-react';
+import { Crosshair, Camera as CameraIcon, RefreshCw, Zap } from 'lucide-react';
 
 export const BirdHuntApp = () => {
   const containerRef = useRef(null);
@@ -7,6 +7,7 @@ export const BirdHuntApp = () => {
   const videoRef = useRef(null);
 
   const [score, setScore] = useState(0);
+  const [speedMultiplier, setSpeedMultiplier] = useState(1.0);
   const [loading, setLoading] = useState(true);
   const [cameraError, setCameraError] = useState(null);
 
@@ -57,18 +58,25 @@ export const BirdHuntApp = () => {
 
     // --- Bird Class ---
     class Bird {
-      constructor(canvasWidth, canvasHeight) {
+      constructor(canvasWidth, canvasHeight, currentScore) {
         this.radius = 24;
         this.fromLeft = Math.random() > 0.5;
         this.x = this.fromLeft ? -50 : canvasWidth + 50;
         this.y = Math.random() * (canvasHeight - 250) + 50;
-        this.speed = (Math.random() * 3 + 2.5) * (this.fromLeft ? 1 : -1);
+
+        // Dynamic speed scaling: starts slow (1.0x), increases continuously based on score
+        // Starts with base speed ~1.2 - 2.2 px/frame. Speed multiplier increases with score.
+        const currentMultiplier = Math.min(5.0, 1.0 + (currentScore / 20) * 0.3);
+        const baseSpeed = Math.random() * 1.0 + 1.2;
+
+        this.speed = baseSpeed * currentMultiplier * (this.fromLeft ? 1 : -1);
         this.wingAngle = 0;
-        this.wingSpeed = 0.15;
+        this.wingSpeed = 0.12 * Math.min(2.5, currentMultiplier);
         this.color = `hsl(${Math.random() * 60 + 10}, 80%, 50%)`;
       }
 
       update() {
+        // Slight dynamic acceleration as the bird flies
         this.x += this.speed;
         this.wingAngle += this.wingSpeed;
       }
@@ -161,7 +169,12 @@ export const BirdHuntApp = () => {
             particles.push(new Particle(b.x, b.y, b.color));
           }
           birds.splice(i, 1);
-          setScore((prev) => prev + 10);
+          setScore((prev) => {
+            const nextScore = prev + 10;
+            // Update speed multiplier state
+            setSpeedMultiplier((1.0 + (nextScore / 20) * 0.3).toFixed(1));
+            return nextScore;
+          });
           break;
         }
       }
@@ -232,8 +245,10 @@ export const BirdHuntApp = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           frameCount++;
-          if (frameCount % 80 === 0 && birds.length < 6) {
-            birds.push(new Bird(canvas.width, canvas.height));
+          // Spawn interval decreases slightly as score increases to add intensity
+          const spawnInterval = Math.max(45, 80 - Math.floor(scoreRef.current / 30) * 5);
+          if (frameCount % spawnInterval === 0 && birds.length < 7) {
+            birds.push(new Bird(canvas.width, canvas.height, scoreRef.current));
           }
 
           for (let i = birds.length - 1; i >= 0; i--) {
@@ -374,16 +389,23 @@ export const BirdHuntApp = () => {
         </div>
       )}
 
-      {/* Score Header UI */}
-      <div className="absolute top-4 left-4 z-20 text-white font-bold text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] flex items-center gap-2">
-        <Crosshair className="w-7 h-7 text-red-500" />
-        <span>Score: <span className="text-amber-300 font-mono">{score}</span></span>
+      {/* Score & Speed Multiplier Header UI */}
+      <div className="absolute top-4 left-4 z-20 text-white font-bold text-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] flex items-center gap-4 bg-black/40 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20">
+        <div className="flex items-center gap-2">
+          <Crosshair className="w-6 h-6 text-red-500" />
+          <span>Score: <span className="text-amber-300 font-mono">{score}</span></span>
+        </div>
+        <div className="flex items-center gap-1.5 text-amber-400 border-l border-white/20 pl-4">
+          <Zap className="w-5 h-5 fill-current text-amber-400 animate-pulse" />
+          <span>Speed: <span className="text-emerald-300 font-mono">{speedMultiplier}x</span></span>
+        </div>
       </div>
 
       {/* Controls Instructions */}
       <div className="absolute bottom-4 left-4 z-20 text-xs text-slate-100 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-lg border border-white/20 shadow-lg space-y-1">
         <div>👉 <b>Aim:</b> Index Fingertip</div>
         <div>💥 <b>Shoot:</b> Pinch thumb & index finger together!</div>
+        <div className="text-[10px] text-amber-300 font-mono">⚡ Birds speed up as score increases!</div>
       </div>
 
       {/* Webcam Feed Preview (Mirrored) */}
