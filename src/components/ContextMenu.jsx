@@ -13,7 +13,16 @@ import {
   Minimize2
 } from 'lucide-react';
 
-export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
+export const ContextMenu = ({
+  x,
+  y,
+  onClose,
+  onAddCustomFolder,
+  onSortShortcutsByName,
+  onSortShortcutsByCategory,
+  onSortShortcutsByChaos,
+  onResetShortcuts
+}) => {
   const {
     playSound,
     addNotification,
@@ -58,15 +67,15 @@ export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
   };
 
   const hasWindows = windows.length > 0;
-  const menuHeight = hasWindows ? 360 : 260;
+  const menuHeight = hasWindows ? 480 : 360;
 
-  const posX = Math.max(10, Math.min(x, (typeof window !== 'undefined' ? window.innerWidth : 800) - 220));
+  const posX = Math.max(10, Math.min(x, (typeof window !== 'undefined' ? window.innerWidth : 800) - 230));
   const posY = Math.max(10, Math.min(y, (typeof window !== 'undefined' ? window.innerHeight : 600) - menuHeight));
 
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed bg-slate-950/95 border border-slate-800 rounded-xl shadow-2xl backdrop-blur-2xl z-[9800] py-1.5 w-56 text-xs font-sans select-none animate-fadeIn border-amber-500/30"
+      className="fixed bg-slate-950/95 border border-slate-800 rounded-xl shadow-2xl backdrop-blur-2xl z-[9800] py-1.5 w-56 text-xs font-sans select-none animate-fadeIn border-amber-500/30 max-h-[90vh] overflow-y-auto custom-scrollbar"
       style={{ left: `${posX}px`, top: `${posY}px` }}
     >
       <button
@@ -91,6 +100,56 @@ export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
       >
         <Image className="w-3.5 h-3.5 text-blue-400" />
         <span>Change Wallpaper</span>
+      </button>
+
+      {/* App Shortcuts Sorting Section */}
+      <div className="my-1 border-t border-slate-800" />
+      <div className="px-3 py-1 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider">
+        Sort Desktop Shortcuts
+      </div>
+
+      <button
+        onClick={() => {
+          if (onSortShortcutsByName) onSortShortcutsByName();
+          onClose();
+        }}
+        className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+      >
+        <SortAsc className="w-3.5 h-3.5 text-purple-400" />
+        <span>Sort by Name (A-Z) 🔤</span>
+      </button>
+
+      <button
+        onClick={() => {
+          if (onSortShortcutsByCategory) onSortShortcutsByCategory();
+          onClose();
+        }}
+        className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+      >
+        <ArrowUpDown className="w-3.5 h-3.5 text-emerald-400" />
+        <span>Sort by Category 📁</span>
+      </button>
+
+      <button
+        onClick={() => {
+          if (onSortShortcutsByChaos) onSortShortcutsByChaos();
+          onClose();
+        }}
+        className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+      >
+        <Laugh className="w-3.5 h-3.5 text-amber-400" />
+        <span>Chaos Shuffle (Uselessness) 🤣</span>
+      </button>
+
+      <button
+        onClick={() => {
+          if (onResetShortcuts) onResetShortcuts();
+          onClose();
+        }}
+        className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-300 flex items-center gap-2.5 cursor-pointer"
+      >
+        <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
+        <span>Reset Default Layout 🔄</span>
       </button>
 
       {/* App Window Layout & Sorting Options */}

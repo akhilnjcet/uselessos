@@ -29,6 +29,164 @@ export const Desktop = () => {
   const [customFolders, setCustomFolders] = useState([]);
   const [productivityAlert, setProductivityAlert] = useState(false);
 
+  // --- App Shortcuts Rearrangable State ---
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const wasDraggedRef = React.useRef(false);
+
+  const getDefaultShortcuts = (charsList = characters, foldersList = customFolders) => {
+    const chars = charsList.map((char) => ({
+      id: `char_${char.id}`,
+      type: 'character',
+      title: char.name,
+      icon: char.icon,
+      props: { characterId: char.id },
+      avatarBg: char.avatarBg || 'linear-gradient(135deg, #1e293b, #0f172a)',
+      category: 'character'
+    }));
+
+    const apps = [
+      { id: 'app_trollCenter', type: 'trollCenter', title: 'Troll Center', icon: '🤣', bg: 'from-amber-500/80 to-red-500/80', category: 'app' },
+      { id: 'app_chaaya', type: 'chaaya', title: 'Chaaya', icon: '☕', bg: 'from-amber-600/80 to-amber-800/80', category: 'app' },
+      { id: 'app_uselessAI', type: 'uselessAI', title: 'Useless AI', icon: '🧠', bg: 'from-purple-600/80 to-indigo-600/80', category: 'app' },
+      { id: 'app_nothing', type: 'nothing', title: 'Nothing', icon: '🗑️', bg: 'from-slate-700/80 to-slate-900/80', category: 'app' },
+      { id: 'app_paniPaali', type: 'paniPaali', title: 'Pani Paali', icon: '💀', bg: 'from-red-600/80 to-slate-900/80', category: 'app' },
+      { id: 'app_fileManager', type: 'fileManager', title: 'My Files', icon: '📁', bg: 'from-blue-600/80 to-cyan-600/80', category: 'app' },
+      { id: 'app_browser', type: 'browser', title: 'Naatile Browser', icon: '🌐', bg: 'from-emerald-600/80 to-teal-700/80', category: 'app' },
+      { id: 'app_whatsapp', type: 'whatsapp', title: 'WhatsApp', icon: '📱', bg: 'from-emerald-500/80 to-green-600/80', category: 'app' },
+      { id: 'app_earthquake', type: 'earthquake', title: 'Earthquake', icon: '🌍', bg: 'from-amber-700/80 to-red-800/80', category: 'app' },
+      { id: 'app_rain', type: 'rain', title: 'Monsoon Rain', icon: '🌧️', bg: 'from-cyan-700/80 to-blue-900/80', category: 'app' },
+      { id: 'app_nightSky', type: 'nightSky', title: 'Night Sky', icon: '🌌', bg: 'from-indigo-900/80 to-purple-950/80', category: 'app' },
+      { id: 'app_chaosMode', type: 'chaosMode', title: 'Chaos Mode', icon: '💥', bg: 'from-red-600/80 to-purple-800/80', category: 'app' },
+      { id: 'app_environment', type: 'environment', title: 'Environment', icon: '🌍', bg: 'from-emerald-700/80 to-teal-900/80', category: 'app' },
+      { id: 'app_commonSense', type: 'commonSense', title: 'Common Sense', icon: '🧠', bg: 'from-purple-700/80 to-pink-900/80', category: 'app' },
+      { id: 'app_findMyCharger', type: 'findMyCharger', title: 'Find My Charger', icon: '🔌', bg: 'from-amber-600/80 to-orange-800/80', category: 'app' },
+      { id: 'app_ammavanCall', type: 'ammavanCall', title: 'Ammavan Call', icon: '📞', bg: 'from-green-700/80 to-emerald-900/80', category: 'app' },
+      { id: 'app_computerCleaner', type: 'computerCleaner', title: 'Cleaner', icon: '🧹', bg: 'from-cyan-600/80 to-teal-800/80', category: 'app' },
+      { id: 'app_astroTalk', type: 'astroTalk', title: 'Astro Talk', icon: '🔮', bg: 'from-purple-800/80 to-indigo-900/80', category: 'app' },
+      { id: 'app_birdHunt', type: 'birdHunt', title: 'Bird Hunt', icon: '🦅', bg: 'from-sky-600/80 to-teal-700/80', category: 'app' },
+      { id: 'app_settings', type: 'settings', title: 'Settings', icon: '⚙️', bg: 'from-slate-600/80 to-slate-800/80', category: 'app' }
+    ];
+
+    const folders = foldersList.map((fName, idx) => ({
+      id: `folder_${idx}_${fName}`,
+      type: 'fileManager',
+      title: fName,
+      icon: '📁',
+      bg: 'from-amber-600/80 to-yellow-600/80',
+      category: 'folder'
+    }));
+
+    return [...chars, ...apps, ...folders];
+  };
+
+  const [shortcuts, setShortcuts] = useState(() => {
+    const defaults = getDefaultShortcuts(characters, []);
+    const savedOrder = localStorage.getItem('malayaliOS_app_shortcuts_order');
+    if (savedOrder) {
+      try {
+        const orderIds = JSON.parse(savedOrder);
+        const map = new Map(defaults.map((item) => [item.id, item]));
+        const ordered = orderIds.map((id) => map.get(id)).filter(Boolean);
+        defaults.forEach((item) => {
+          if (!ordered.some((o) => o.id === item.id)) ordered.push(item);
+        });
+        return ordered;
+      } catch (e) {
+        return defaults;
+      }
+    }
+    return defaults;
+  });
+
+  // Keep shortcuts synced with character/folder updates
+  useEffect(() => {
+    const defaults = getDefaultShortcuts(characters, customFolders);
+    setShortcuts((prev) => {
+      const map = new Map(prev.map((item) => [item.id, item]));
+      const updated = defaults.map((item) => map.get(item.id) || item);
+      return updated;
+    });
+  }, [characters, customFolders]);
+
+  // Persist shortcut order in localStorage
+  useEffect(() => {
+    const orderIds = shortcuts.map((s) => s.id);
+    localStorage.setItem('malayaliOS_app_shortcuts_order', JSON.stringify(orderIds));
+  }, [shortcuts]);
+
+  // --- Drag and Drop Handlers for Shortcuts ---
+  const handleDragStart = (e, index) => {
+    e.dataTransfer.effectAllowed = 'move';
+    wasDraggedRef.current = true;
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnter = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    const newShortcuts = [...shortcuts];
+    const [draggedItem] = newShortcuts.splice(draggedIndex, 1);
+    newShortcuts.splice(targetIndex, 0, draggedItem);
+
+    setShortcuts(newShortcuts);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    playSound('click');
+    addNotification('Shortcuts Rearranged', `Moved "${draggedItem.title}" to position ${targetIndex + 1}. 📌`, '📍');
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setTimeout(() => {
+      wasDraggedRef.current = false;
+    }, 100);
+  };
+
+  const handleShortcutClick = (shortcut) => {
+    if (wasDraggedRef.current) return;
+    openApp(shortcut.type, shortcut.props || {}, shortcut.title, shortcut.icon);
+  };
+
+  // --- Shortcut Sorting Functions ---
+  const handleSortShortcutsByName = () => {
+    const sorted = [...shortcuts].sort((a, b) => a.title.localeCompare(b.title));
+    setShortcuts(sorted);
+    playSound('click');
+    addNotification('Shortcuts Sorted', 'App shortcuts sorted alphabetically (A-Z). 🔤', '🔤');
+  };
+
+  const handleSortShortcutsByCategory = () => {
+    const categoryOrder = { character: 1, app: 2, folder: 3 };
+    const sorted = [...shortcuts].sort((a, b) => (categoryOrder[a.category] || 9) - (categoryOrder[b.category] || 9));
+    setShortcuts(sorted);
+    playSound('click');
+    addNotification('Shortcuts Grouped', 'App shortcuts sorted by category. 📁', '📁');
+  };
+
+  const handleSortShortcutsByChaos = () => {
+    const shuffled = [...shortcuts].sort(() => Math.random() - 0.5);
+    setShortcuts(shuffled);
+    playSound('click');
+    addNotification('Chaos Shuffle', 'App shortcuts sorted by 99.9% uselessness! 😂', '🤣');
+  };
+
+  const handleResetShortcuts = () => {
+    const defaults = getDefaultShortcuts(characters, customFolders);
+    setShortcuts(defaults);
+    playSound('click');
+    addNotification('Layout Reset', 'Restored default app shortcuts grid.', '🔄');
+  };
+
   // Tired Mouse Tracker
   useEffect(() => {
     let moveCount = 0;
@@ -88,30 +246,6 @@ export const Desktop = () => {
     setCustomFolders((prev) => [...prev, name]);
   };
 
-  // System App Icons Configuration
-  const systemApps = [
-    { type: 'trollCenter', title: 'Troll Center', icon: '🤣', bg: 'from-amber-500/80 to-red-500/80' },
-    { type: 'chaaya', title: 'Chaaya', icon: '☕', bg: 'from-amber-600/80 to-amber-800/80' },
-    { type: 'uselessAI', title: 'Useless AI', icon: '🧠', bg: 'from-purple-600/80 to-indigo-600/80' },
-    { type: 'nothing', title: 'Nothing', icon: '🗑️', bg: 'from-slate-700/80 to-slate-900/80' },
-    { type: 'paniPaali', title: 'Pani Paali', icon: '💀', bg: 'from-red-600/80 to-slate-900/80' },
-    { type: 'fileManager', title: 'My Files', icon: '📁', bg: 'from-blue-600/80 to-cyan-600/80' },
-    { type: 'browser', title: 'Naatile Browser', icon: '🌐', bg: 'from-emerald-600/80 to-teal-700/80' },
-    { type: 'whatsapp', title: 'WhatsApp', icon: '📱', bg: 'from-emerald-500/80 to-green-600/80' },
-    { type: 'earthquake', title: 'Earthquake', icon: '🌍', bg: 'from-amber-700/80 to-red-800/80' },
-    { type: 'rain', title: 'Monsoon Rain', icon: '🌧️', bg: 'from-cyan-700/80 to-blue-900/80' },
-    { type: 'nightSky', title: 'Night Sky', icon: '🌌', bg: 'from-indigo-900/80 to-purple-950/80' },
-    { type: 'chaosMode', title: 'Chaos Mode', icon: '💥', bg: 'from-red-600/80 to-purple-800/80' },
-    { type: 'environment', title: 'Environment', icon: '🌍', bg: 'from-emerald-700/80 to-teal-900/80' },
-    { type: 'commonSense', title: 'Common Sense', icon: '🧠', bg: 'from-purple-700/80 to-pink-900/80' },
-    { type: 'findMyCharger', title: 'Find My Charger', icon: '🔌', bg: 'from-amber-600/80 to-orange-800/80' },
-    { type: 'ammavanCall', title: 'Ammavan Call', icon: '📞', bg: 'from-green-700/80 to-emerald-900/80' },
-    { type: 'computerCleaner', title: 'Cleaner', icon: '🧹', bg: 'from-cyan-600/80 to-teal-800/80' },
-    { type: 'astroTalk', title: 'Astro Talk', icon: '🔮', bg: 'from-purple-800/80 to-indigo-900/80' },
-    { type: 'birdHunt', title: 'Bird Hunt', icon: '🦅', bg: 'from-sky-600/80 to-teal-700/80' },
-    { type: 'settings', title: 'Settings', icon: '⚙️', bg: 'from-slate-600/80 to-slate-800/80' }
-  ];
-
   // Dynamic Wallpaper Styling
   const getWallpaperStyle = () => {
     switch (wallpaper) {
@@ -160,60 +294,44 @@ export const Desktop = () => {
       {/* Subtle overlay for icon readability when using image wallpaper */}
       <div className="absolute inset-0 bg-black/15 pointer-events-none z-[1]" />
 
-      {/* Desktop Icons Grid Container */}
+      {/* Desktop App Shortcuts Grid Container (Rearrangable via Drag & Drop) */}
       <div className="p-3 sm:p-6 pt-10 sm:pt-14 flex flex-wrap content-start max-h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar gap-3 sm:gap-6 z-10 relative">
-        {/* 1. Comedy Character Icons */}
-        {characters.map((char) => (
-          <div
-            key={char.id}
-            onClick={() => openApp('character', { characterId: char.id }, `😂 ${char.name}`, char.icon)}
-            className="group w-20 sm:w-24 p-2 rounded-2xl flex flex-col items-center text-center gap-1.5 cursor-pointer hover:bg-black/30 transition-all duration-200 backdrop-blur-md border border-white/10 hover:border-amber-400/50 shadow-xl"
-          >
-            <div
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-xl group-hover:scale-110 transition-transform border border-white/30"
-              style={{ background: char.avatarBg || 'linear-gradient(135deg, #1e293b, #0f172a)' }}
-            >
-              {char.icon}
-            </div>
-            <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
-              {char.name}
-            </span>
-          </div>
-        ))}
+        {shortcuts.map((app, idx) => {
+          const isBeingDragged = draggedIndex === idx;
+          const isTargetOver = dragOverIndex === idx;
 
-        {/* 2. System App Icons */}
-        {systemApps.map((app, idx) => (
-          <div
-            key={idx}
-            onClick={() => openApp(app.type, {}, app.title, app.icon)}
-            className="group w-20 sm:w-24 p-2 rounded-2xl flex flex-col items-center text-center gap-1.5 cursor-pointer hover:bg-black/30 transition-all duration-200 backdrop-blur-md border border-white/10 hover:border-amber-400/50 shadow-xl"
-          >
+          return (
             <div
-              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${app.bg} flex items-center justify-center text-2xl sm:text-3xl shadow-xl group-hover:scale-110 transition-transform border border-white/30`}
+              key={app.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, idx)}
+              onDragEnter={(e) => handleDragEnter(e, idx)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => handleDrop(e, idx)}
+              onDragEnd={handleDragEnd}
+              onClick={() => handleShortcutClick(app)}
+              className={`group w-20 sm:w-24 p-2 rounded-2xl flex flex-col items-center text-center gap-1.5 cursor-grab active:cursor-grabbing hover:bg-black/40 transition-all duration-200 backdrop-blur-md border ${
+                isTargetOver
+                  ? 'border-2 border-amber-400 scale-110 shadow-2xl bg-amber-500/30 ring-4 ring-amber-400/40 animate-pulse'
+                  : isBeingDragged
+                  ? 'opacity-40 scale-95 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]'
+                  : 'border-white/10 hover:border-amber-400/50 shadow-xl'
+              }`}
             >
-              {app.icon}
+              <div
+                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${
+                  app.avatarBg ? '' : `bg-gradient-to-br ${app.bg || 'from-slate-700/80 to-slate-900/80'}`
+                } flex items-center justify-center text-2xl sm:text-3xl shadow-xl group-hover:scale-110 transition-transform border border-white/30`}
+                style={app.avatarBg ? { background: app.avatarBg } : {}}
+              >
+                {app.icon}
+              </div>
+              <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
+                {app.title}
+              </span>
             </div>
-            <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
-              {app.title}
-            </span>
-          </div>
-        ))}
-
-        {/* 3. Custom Desktop Folders created via right click */}
-        {customFolders.map((folderName, idx) => (
-          <div
-            key={idx}
-            onClick={() => openApp('fileManager', {}, folderName, '📁')}
-            className="group w-20 sm:w-24 p-2 rounded-2xl flex flex-col items-center text-center gap-1.5 cursor-pointer hover:bg-black/30 transition-all duration-200 backdrop-blur-md border border-white/10"
-          >
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-600/80 to-yellow-600/80 flex items-center justify-center text-3xl shadow-xl group-hover:scale-110 transition-transform border border-white/30">
-              📁
-            </div>
-            <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
-              {folderName}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Floating Window Layer */}
@@ -246,6 +364,10 @@ export const Desktop = () => {
           y={contextMenu.y}
           onClose={() => setContextMenu(null)}
           onAddCustomFolder={handleAddCustomFolder}
+          onSortShortcutsByName={handleSortShortcutsByName}
+          onSortShortcutsByCategory={handleSortShortcutsByCategory}
+          onSortShortcutsByChaos={handleSortShortcutsByChaos}
+          onResetShortcuts={handleResetShortcuts}
         />
       )}
 
