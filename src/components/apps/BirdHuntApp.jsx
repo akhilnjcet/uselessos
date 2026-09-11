@@ -66,7 +66,7 @@ export const BirdHuntApp = () => {
 
         // Dynamic speed scaling: starts from minimum 1.5x, increases continuously based on score
         const currentMultiplier = Math.min(5.0, 1.5 + (currentScore / 20) * 0.3);
-        const baseSpeed = Math.random() * 1.0 + 1.5; // Starts at minimum 1.5 speed
+        const baseSpeed = Math.random() * 1.0 + 1.5;
 
         this.speed = baseSpeed * currentMultiplier * (this.fromLeft ? 1 : -1);
         this.wingAngle = 0;
@@ -74,10 +74,10 @@ export const BirdHuntApp = () => {
         this.color = `hsl(${Math.random() * 60 + 10}, 80%, 50%)`;
       }
 
-      update() {
-        // Slight dynamic acceleration as the bird flies
-        this.x += this.speed;
-        this.wingAngle += this.wingSpeed;
+      update(dt = 1) {
+        // Position update scaled with delta time (dt) for framerate-independent constant speed
+        this.x += this.speed * dt;
+        this.wingAngle += this.wingSpeed * dt;
       }
 
       draw(ctx) {
@@ -134,10 +134,10 @@ export const BirdHuntApp = () => {
         this.size = Math.random() * 5 + 3;
       }
 
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= 0.03;
+      update(dt = 1) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.alpha -= 0.03 * dt;
       }
 
       draw(ctx) {
@@ -170,7 +170,6 @@ export const BirdHuntApp = () => {
           birds.splice(i, 1);
           setScore((prev) => {
             const nextScore = prev + 10;
-            // Update speed multiplier state starting from 1.5x minimum
             setSpeedMultiplier((1.5 + (nextScore / 20) * 0.3).toFixed(1));
             return nextScore;
           });
@@ -238,20 +237,27 @@ export const BirdHuntApp = () => {
 
         const ctx = canvas.getContext('2d');
 
-        // Main Animation Loop
-        const gameLoop = () => {
+        // Delta-time delta tracker to keep bird speed constant regardless of hand tracking AI workload
+        let lastTime = performance.now();
+
+        // Main Framerate-Independent Game Loop
+        const gameLoop = (timestamp) => {
           if (!isMounted || !canvas) return;
+          const now = timestamp || performance.now();
+          const rawDt = (now - lastTime) / 16.67; // Normalized to 60 FPS (1.0 at 60 FPS)
+          const dt = Math.min(Math.max(rawDt, 0.5), 3.0); // Clamp to prevent huge teleport jumps on tab switch
+          lastTime = now;
+
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           frameCount++;
-          // Spawn interval decreases slightly as score increases to add intensity
           const spawnInterval = Math.max(45, 80 - Math.floor(scoreRef.current / 30) * 5);
           if (frameCount % spawnInterval === 0 && birds.length < 7) {
             birds.push(new Bird(canvas.width, canvas.height, scoreRef.current));
           }
 
           for (let i = birds.length - 1; i >= 0; i--) {
-            birds[i].update();
+            birds[i].update(dt);
             birds[i].draw(ctx);
             if (birds[i].x < -100 || birds[i].x > canvas.width + 100) {
               birds.splice(i, 1);
@@ -259,7 +265,7 @@ export const BirdHuntApp = () => {
           }
 
           for (let i = particles.length - 1; i >= 0; i--) {
-            particles[i].update();
+            particles[i].update(dt);
             particles[i].draw(ctx);
             if (particles[i].alpha <= 0) particles.splice(i, 1);
           }
@@ -268,9 +274,9 @@ export const BirdHuntApp = () => {
           animFrameId = requestAnimationFrame(gameLoop);
         };
 
-        gameLoop();
+        gameLoop(performance.now());
 
-        // Setup MediaPipe Hands
+        // Setup MediaPipe Hands with lightweight configuration for zero lag
         const { Hands, Camera } = window;
         if (!Hands || !Camera) {
           throw new Error('MediaPipe libraries failed to initialize.');
@@ -282,9 +288,9 @@ export const BirdHuntApp = () => {
 
         handsInstance.setOptions({
           maxNumHands: 1,
-          modelComplexity: 1,
-          minDetectionConfidence: 0.65,
-          minTrackingConfidence: 0.65
+          modelComplexity: 0, // Lightweight Lite model for maximum performance while aiming
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5
         });
 
         handsInstance.onResults((results) => {
@@ -318,12 +324,12 @@ export const BirdHuntApp = () => {
 
         cameraInstance = new Camera(video, {
           onFrame: async () => {
-            if (video && handsInstance) {
+            if (video && handsInstance && isMounted) {
               await handsInstance.send({ image: video });
             }
           },
-          width: 640,
-          height: 480
+          width: 480,
+          height: 360
         });
 
         await cameraInstance.start();
