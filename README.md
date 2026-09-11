@@ -70,11 +70,17 @@ For Software:
 ![Screenshot1](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/desktop.png)
 *UselessOS Desktop Environment with Draggable Windows & 3D Ambient Canvas*
 
-![Screenshot2](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/wallpaper.jpg)
-*Custom Wallpapers & Malayalam Meme Applications*
+![Screenshot2](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/whatsapp.png)
+*WhatsApp Group App showing Malayalam Meme Conversations*
 
-![Screenshot3](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/favicon.svg)
-*UselessOS System Icon & Interface Assets*
+![Screenshot3](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/astrotalk.png)
+*AstroTalk Malayalam Astrologers Consultation Interface*
+
+![Screenshot4](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/horoscope.png)
+*AstroTalk Daily Horoscope & Lucky Items*
+
+![Screenshot5](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/browser.png)
+*Naatile Browser Searching Comedy Results*
 
 # Diagrams
 
