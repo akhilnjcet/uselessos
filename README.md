@@ -9,7 +9,7 @@
 ### Team Members
 
 - Team Lead: VISAKH B - JCET
-- Member 2: AKHIL N - JCET
+- Member : AKHIL N - JCET
 
 ### Project Description
 
