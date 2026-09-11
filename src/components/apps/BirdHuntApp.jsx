@@ -22,8 +22,11 @@ export const BirdHuntApp = () => {
     let birds = [];
     let particles = [];
     let crosshair = { x: -100, y: -100 };
+    let targetCrosshair = { x: -100, y: -100 };
     let canShoot = true;
     let frameCount = 0;
+    let hasLoaded = false;
+    let isProcessingHand = false;
 
     // Web Audio Synthesizer for Gunshot sound
     let audioCtx = null;
@@ -75,7 +78,7 @@ export const BirdHuntApp = () => {
       }
 
       update(dt = 1) {
-        // Position update scaled with delta time (dt) for framerate-independent constant speed
+        // Framerate-independent constant speed movement
         this.x += this.speed * dt;
         this.wingAngle += this.wingSpeed * dt;
       }
@@ -237,16 +240,32 @@ export const BirdHuntApp = () => {
 
         const ctx = canvas.getContext('2d');
 
-        // Delta-time delta tracker to keep bird speed constant regardless of hand tracking AI workload
+        // Delta-time tracker
         let lastTime = performance.now();
 
         // Main Framerate-Independent Game Loop
         const gameLoop = (timestamp) => {
           if (!isMounted || !canvas) return;
           const now = timestamp || performance.now();
-          const rawDt = (now - lastTime) / 16.67; // Normalized to 60 FPS (1.0 at 60 FPS)
-          const dt = Math.min(Math.max(rawDt, 0.5), 3.0); // Clamp to prevent huge teleport jumps on tab switch
+          const deltaMs = now - lastTime;
           lastTime = now;
+
+          // Normalize to 60fps (1.0 at 16.67ms)
+          const dt = Math.min(Math.max(deltaMs / 16.67, 0.4), 2.5);
+
+          // Smooth lerp crosshair towards target for 60fps fluid motion
+          if (targetCrosshair.x >= 0) {
+            if (crosshair.x < 0) {
+              crosshair.x = targetCrosshair.x;
+              crosshair.y = targetCrosshair.y;
+            } else {
+              crosshair.x += (targetCrosshair.x - crosshair.x) * 0.45;
+              crosshair.y += (targetCrosshair.y - crosshair.y) * 0.45;
+            }
+          } else {
+            crosshair.x = -100;
+            crosshair.y = -100;
+          }
 
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -288,20 +307,24 @@ export const BirdHuntApp = () => {
 
         handsInstance.setOptions({
           maxNumHands: 1,
-          modelComplexity: 0, // Lightweight Lite model for maximum performance while aiming
+          modelComplexity: 0, // Lite model
           minDetectionConfidence: 0.5,
           minTrackingConfidence: 0.5
         });
 
         handsInstance.onResults((results) => {
-          setLoading(false);
+          if (!hasLoaded) {
+            hasLoaded = true;
+            setLoading(false);
+          }
+
           if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             const landmarks = results.multiHandLandmarks[0];
             const indexTip = landmarks[8];
             const thumbTip = landmarks[4];
 
-            crosshair.x = (1 - indexTip.x) * canvas.width;
-            crosshair.y = indexTip.y * canvas.height;
+            targetCrosshair.x = (1 - indexTip.x) * canvas.width;
+            targetCrosshair.y = indexTip.y * canvas.height;
 
             const pinchDistance = Math.hypot(
               (1 - indexTip.x) - (1 - thumbTip.x),
@@ -317,19 +340,25 @@ export const BirdHuntApp = () => {
               canShoot = true;
             }
           } else {
-            crosshair.x = -100;
-            crosshair.y = -100;
+            targetCrosshair.x = -100;
+            targetCrosshair.y = -100;
           }
         });
 
         cameraInstance = new Camera(video, {
           onFrame: async () => {
-            if (video && handsInstance && isMounted) {
+            if (!isMounted || !video || !handsInstance || isProcessingHand) return;
+            isProcessingHand = true;
+            try {
               await handsInstance.send({ image: video });
+            } catch (err) {
+              // ignore
+            } finally {
+              isProcessingHand = false;
             }
           },
-          width: 480,
-          height: 360
+          width: 320,
+          height: 240
         });
 
         await cameraInstance.start();
