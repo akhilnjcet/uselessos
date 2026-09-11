@@ -1,9 +1,31 @@
 import React from 'react';
 import { useOS } from '../context/OSContext';
-import { RefreshCw, FolderPlus, Image, ArrowUpDown, Laugh, HelpCircle } from 'lucide-react';
+import {
+  RefreshCw,
+  FolderPlus,
+  Image,
+  ArrowUpDown,
+  Laugh,
+  HelpCircle,
+  LayoutGrid,
+  Layers,
+  SortAsc,
+  Minimize2
+} from 'lucide-react';
 
 export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
-  const { playSound, addNotification, setWallpaper, wallpaper, openApp } = useOS();
+  const {
+    playSound,
+    addNotification,
+    setWallpaper,
+    wallpaper,
+    openApp,
+    windows,
+    cascadeWindows,
+    tileWindows,
+    sortWindowsByName,
+    minimizeAllWindows
+  } = useOS();
 
   const handleRefresh = () => {
     playSound('click');
@@ -35,13 +57,16 @@ export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
     onClose();
   };
 
+  const hasWindows = windows.length > 0;
+  const menuHeight = hasWindows ? 360 : 260;
+
   const posX = Math.max(10, Math.min(x, (typeof window !== 'undefined' ? window.innerWidth : 800) - 220));
-  const posY = Math.max(10, Math.min(y, (typeof window !== 'undefined' ? window.innerHeight : 600) - 260));
+  const posY = Math.max(10, Math.min(y, (typeof window !== 'undefined' ? window.innerHeight : 600) - menuHeight));
 
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed bg-slate-950/95 border border-slate-800 rounded-xl shadow-2xl backdrop-blur-2xl z-[9800] py-1.5 w-52 text-xs font-sans select-none animate-fadeIn border-amber-500/30"
+      className="fixed bg-slate-950/95 border border-slate-800 rounded-xl shadow-2xl backdrop-blur-2xl z-[9800] py-1.5 w-56 text-xs font-sans select-none animate-fadeIn border-amber-500/30"
       style={{ left: `${posX}px`, top: `${posY}px` }}
     >
       <button
@@ -68,13 +93,47 @@ export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
         <span>Change Wallpaper</span>
       </button>
 
-      <button
-        onClick={() => { playSound('click'); addNotification('Sorted', 'Icons sorted by uselessness.', '🗂️'); onClose(); }}
-        className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
-      >
-        <ArrowUpDown className="w-3.5 h-3.5 text-purple-400" />
-        <span>Sort Icons</span>
-      </button>
+      {/* App Window Layout & Sorting Options */}
+      {hasWindows && (
+        <>
+          <div className="my-1 border-t border-slate-800" />
+          <div className="px-3 py-1 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider">
+            App Window Layout
+          </div>
+
+          <button
+            onClick={() => { cascadeWindows(); onClose(); }}
+            className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+          >
+            <Layers className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Cascade Windows 📐</span>
+          </button>
+
+          <button
+            onClick={() => { tileWindows(); onClose(); }}
+            className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+          >
+            <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Tile Side-by-Side 🧩</span>
+          </button>
+
+          <button
+            onClick={() => { sortWindowsByName(); onClose(); }}
+            className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+          >
+            <SortAsc className="w-3.5 h-3.5 text-purple-400" />
+            <span>Sort Windows by Title 🔤</span>
+          </button>
+
+          <button
+            onClick={() => { minimizeAllWindows(); onClose(); }}
+            className="w-full px-3 py-2 text-left hover:bg-slate-800/90 text-slate-200 flex items-center gap-2.5 cursor-pointer"
+          >
+            <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+            <span>Minimize All / Show Desktop 🧹</span>
+          </button>
+        </>
+      )}
 
       <div className="my-1 border-t border-slate-800" />
 

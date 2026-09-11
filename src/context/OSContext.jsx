@@ -643,6 +643,101 @@ export const OSProvider = ({ children }) => {
     );
   };
 
+  // --- Window Sorting & Layout System ---
+  const cascadeWindows = () => {
+    playSound('click');
+    if (windows.length === 0) {
+      addNotification('No Windows', 'തുറന്ന Window ഒന്നും ഇല്ലെടാ! 🤷‍♂️', '📐');
+      return;
+    }
+    const visibleWins = windows.filter((w) => !w.isMinimized);
+    if (visibleWins.length === 0) {
+      addNotification('No Active Windows', 'എല്ലാ window ഉം minimized ആണ്. 📌', '📐');
+      return;
+    }
+    let startZ = maxZIndex + 1;
+    const updatedWindows = windows.map((w) => {
+      if (w.isMinimized) return w;
+      const idx = visibleWins.findIndex((vw) => vw.id === w.id);
+      const posX = Math.min(window.innerWidth - 300, 60 + idx * 35);
+      const posY = Math.min(window.innerHeight - 300, 50 + idx * 35);
+      startZ++;
+      return {
+        ...w,
+        position: { x: posX, y: posY },
+        isMaximized: false,
+        zIndex: startZ
+      };
+    });
+    setMaxZIndex(startZ);
+    setWindows(updatedWindows);
+    addNotification('📐 Windows Cascaded', 'എല്ലാ window ഉം വരി വരിയായി വച്ചിട്ടുണ്ട്!', '📐');
+  };
+
+  const tileWindows = () => {
+    playSound('click');
+    const activeWins = windows.filter((w) => !w.isMinimized);
+    if (activeWins.length === 0) {
+      addNotification('No Active Windows', 'തുറന്ന Window ഒന്നും ഇല്ലെടാ! 🧩', '🧩');
+      return;
+    }
+    const count = activeWins.length;
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    const availWidth = window.innerWidth;
+    const availHeight = window.innerHeight - 48; // Taskbar offset
+    const cellW = Math.floor(availWidth / cols);
+    const cellH = Math.floor(availHeight / rows);
+
+    let startZ = maxZIndex + 1;
+    const updatedWindows = windows.map((w) => {
+      if (w.isMinimized) return w;
+      const idx = activeWins.findIndex((vw) => vw.id === w.id);
+      const r = Math.floor(idx / cols);
+      const c = idx % cols;
+      startZ++;
+      return {
+        ...w,
+        position: { x: c * cellW + 10, y: r * cellH + 10 },
+        size: { width: Math.max(280, cellW - 20), height: Math.max(200, cellH - 20) },
+        isMaximized: false,
+        zIndex: startZ
+      };
+    });
+    setMaxZIndex(startZ);
+    setWindows(updatedWindows);
+    addNotification('🧩 Windows Tiled', 'Window എല്ലാം അടുക്കി വച്ചിട്ടുണ്ട്!', '🧩');
+  };
+
+  const sortWindowsByName = () => {
+    playSound('click');
+    if (windows.length === 0) {
+      addNotification('No Windows', 'തുറന്ന Window ഒന്നും ഇല്ലെടാ! 🔤', '🔤');
+      return;
+    }
+    const sorted = [...windows].sort((a, b) => a.title.localeCompare(b.title));
+    let baseZ = 10;
+    const updated = sorted.map((w, idx) => ({
+      ...w,
+      zIndex: baseZ + idx
+    }));
+    setMaxZIndex(baseZ + windows.length);
+    setWindows(updated);
+    addNotification('🔤 Windows Sorted', 'A-Z ക്രമത്തിൽ window അടുക്കി!', '🔤');
+  };
+
+  const minimizeAllWindows = () => {
+    playSound('click');
+    setWindows((prev) => prev.map((w) => ({ ...w, isMinimized: true })));
+    addNotification('🧹 Show Desktop', 'എല്ലാ window ഉം minimize ചെയ്തു!', '🧹');
+  };
+
+  const restoreAllWindows = () => {
+    playSound('click');
+    setWindows((prev) => prev.map((w) => ({ ...w, isMinimized: false })));
+    addNotification('🔄 Windows Restored', 'എല്ലാ window ഉം തിരിച്ചുകൊണ്ടുവന്നു!', '🔄');
+  };
+
   const updateCharacter = (characterId, updatedFields) => {
     setCharacters((prev) =>
       prev.map((c) => (c.id === characterId ? { ...c, ...updatedFields } : c))
@@ -667,6 +762,11 @@ export const OSProvider = ({ children }) => {
         focusWindow,
         updateWindowPosition,
         updateWindowSize,
+        cascadeWindows,
+        tileWindows,
+        sortWindowsByName,
+        minimizeAllWindows,
+        restoreAllWindows,
         notifications,
         addNotification,
         removeNotification,

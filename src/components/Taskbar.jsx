@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOS } from '../context/OSContext';
 import { StartMenu } from './StartMenu';
 import { BatteryPanel } from './BatteryPanel';
-import { Wifi, Battery, Volume2, VolumeX } from 'lucide-react';
+import { Wifi, Volume2, VolumeX, LayoutGrid, Layers, SortAsc, Minimize2 } from 'lucide-react';
 
 export const Taskbar = () => {
   const {
@@ -13,11 +13,17 @@ export const Taskbar = () => {
     isMuted,
     toggleMute,
     openApp,
-    batteryLevel
+    batteryLevel,
+    cascadeWindows,
+    tileWindows,
+    sortWindowsByName,
+    minimizeAllWindows,
+    restoreAllWindows
   } = useOS();
 
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isBatteryOpen, setIsBatteryOpen] = useState(false);
+  const [isArrangeOpen, setIsArrangeOpen] = useState(false);
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
 
@@ -101,6 +107,72 @@ export const Taskbar = () => {
               🤣
             </button>
           </div>
+
+          {/* Window Sorting & Layout Quick Launcher Menu */}
+          {windows.length > 0 && (
+            <div className="relative border-l border-slate-800/80 pl-2">
+              <button
+                onClick={() => {
+                  setIsArrangeOpen(!isArrangeOpen);
+                  setIsStartOpen(false);
+                  setIsBatteryOpen(false);
+                }}
+                className={`p-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1 text-xs font-bold ${
+                  isArrangeOpen
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md scale-105'
+                    : 'bg-slate-900/90 hover:bg-slate-800 text-amber-400 border-slate-700/80'
+                }`}
+                title="Arrange Open App Windows"
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span className="hidden xl:inline text-[11px]">Arrange</span>
+              </button>
+
+              {/* Arrange Flyout Menu */}
+              {isArrangeOpen && (
+                <div className="absolute bottom-14 left-0 w-56 bg-slate-950/95 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-2xl p-2 space-y-1 text-xs font-sans z-[9600] animate-fadeIn border-amber-500/40">
+                  <div className="px-2 py-1 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider border-b border-slate-800 pb-1.5">
+                    📐 App Window Layout
+                  </div>
+                  <button
+                    onClick={() => { cascadeWindows(); setIsArrangeOpen(false); }}
+                    className="w-full px-2.5 py-1.5 hover:bg-slate-800/90 text-slate-200 rounded-xl text-left flex items-center gap-2 cursor-pointer"
+                  >
+                    <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Cascade Windows 📐</span>
+                  </button>
+                  <button
+                    onClick={() => { tileWindows(); setIsArrangeOpen(false); }}
+                    className="w-full px-2.5 py-1.5 hover:bg-slate-800/90 text-slate-200 rounded-xl text-left flex items-center gap-2 cursor-pointer"
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Tile Side-by-Side 🧩</span>
+                  </button>
+                  <button
+                    onClick={() => { sortWindowsByName(); setIsArrangeOpen(false); }}
+                    className="w-full px-2.5 py-1.5 hover:bg-slate-800/90 text-slate-200 rounded-xl text-left flex items-center gap-2 cursor-pointer"
+                  >
+                    <SortAsc className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Sort Windows (A-Z) 🔤</span>
+                  </button>
+                  <div className="border-t border-slate-800 my-1" />
+                  <button
+                    onClick={() => { minimizeAllWindows(); setIsArrangeOpen(false); }}
+                    className="w-full px-2.5 py-1.5 hover:bg-slate-800/90 text-amber-400 rounded-xl text-left flex items-center gap-2 cursor-pointer"
+                  >
+                    <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Show Desktop (Minimize All) 🧹</span>
+                  </button>
+                  <button
+                    onClick={() => { restoreAllWindows(); setIsArrangeOpen(false); }}
+                    className="w-full px-2.5 py-1.5 hover:bg-slate-800/90 text-slate-300 rounded-xl text-left flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>Restore All Windows 🔄</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Center: Open Window Tabs */}

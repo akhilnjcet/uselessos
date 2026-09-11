@@ -50,6 +50,7 @@ export const Window = ({ windowData }) => {
   } = useOS();
 
   const isFocused = activeWindowId === id;
+  const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
   const isResizingRef = useRef(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
@@ -60,6 +61,7 @@ export const Window = ({ windowData }) => {
     if (isMaximized) return;
     focusWindow(id);
     isDraggingRef.current = true;
+    setIsDragging(true);
     dragOffsetRef.current = {
       x: clientX - position.x,
       y: clientY - position.y
@@ -69,13 +71,16 @@ export const Window = ({ windowData }) => {
       if (!isDraggingRef.current) return;
       const curX = e.touches ? e.touches[0].clientX : e.clientX;
       const curY = e.touches ? e.touches[0].clientY : e.clientY;
-      const nextX = Math.max(0, Math.min(window.innerWidth - 100, curX - dragOffsetRef.current.x));
-      const nextY = Math.max(0, Math.min(window.innerHeight - 80, curY - dragOffsetRef.current.y));
+      const maxX = Math.max(0, window.innerWidth - 120);
+      const maxY = Math.max(0, window.innerHeight - 80);
+      const nextX = Math.max(0, Math.min(maxX, curX - dragOffsetRef.current.x));
+      const nextY = Math.max(0, Math.min(maxY, curY - dragOffsetRef.current.y));
       updateWindowPosition(id, { x: nextX, y: nextY });
     };
 
     const handleEnd = () => {
       isDraggingRef.current = false;
+      setIsDragging(false);
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mouseup', handleEnd);
       window.removeEventListener('touchmove', handleMove);
@@ -202,8 +207,10 @@ export const Window = ({ windowData }) => {
   return (
     <div
       onClick={() => focusWindow(id)}
-      className={`fixed flex flex-col rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl transition-shadow duration-300 ${
-        isFocused
+      className={`fixed flex flex-col rounded-2xl overflow-hidden backdrop-blur-xl transition-all duration-150 ${
+        isDragging
+          ? 'ring-2 ring-amber-400 shadow-[0_25px_60px_rgba(245,158,11,0.35)] opacity-95 scale-[1.005] cursor-grabbing'
+          : isFocused
           ? 'ring-2 ring-amber-500/60 shadow-[0_20px_50px_rgba(0,0,0,0.8)]'
           : 'ring-1 ring-slate-800/80 shadow-lg opacity-95'
       }`}
@@ -221,7 +228,9 @@ export const Window = ({ windowData }) => {
         onMouseDown={handleTitleMouseDown}
         onTouchStart={handleTitleTouchStart}
         onDoubleClick={() => toggleMaximizeWindow(id)}
-        className={`h-11 px-4 flex items-center justify-between select-none cursor-move border-b transition-colors flex-shrink-0 ${
+        className={`h-11 px-4 flex items-center justify-between select-none border-b transition-colors flex-shrink-0 ${
+          isDragging ? 'cursor-grabbing bg-slate-900' : 'cursor-grab'
+        } ${
           isFocused
             ? 'bg-slate-900/95 border-slate-700/80 text-slate-100'
             : 'bg-slate-950/90 border-slate-800/60 text-slate-400'
