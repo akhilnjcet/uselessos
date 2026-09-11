@@ -3,7 +3,7 @@ import { useOS } from '../context/OSContext';
 import { Terminal, Coffee, Sparkles } from 'lucide-react';
 
 const BOOT_STEPS = [
-  "Starting MalayaliOS…",
+  "Starting UselessOS…",
   "Checking unnecessary files…",
   "Searching for common sense…",
   "Common sense not found.",
@@ -83,7 +83,7 @@ export const BootScreen = () => {
         <div className="flex items-center gap-3">
           <Terminal className="w-6 h-6 text-emerald-500 animate-pulse" />
           <span className="font-bold text-xl tracking-wider text-emerald-300">
-            MALAYALIOS™ v1.0
+            USELESSOS™ v1.0
           </span>
         </div>
         <button
@@ -98,7 +98,7 @@ export const BootScreen = () => {
       <div className="my-auto max-w-2xl w-full mx-auto space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 tracking-tight">
-            MALAYALIOS™
+            USELESSOS™
           </h1>
           <p className="text-slate-400 text-sm sm:text-base font-sans font-medium">
             The world's most unnecessary operating system.
@@ -138,7 +138,7 @@ export const BootScreen = () => {
 
       {/* Bottom Footer */}
       <div className="text-center text-xs text-slate-600 border-t border-emerald-900/30 pt-3">
-        © MalayaliOS Comedy Engine • No Common Sense Found • All rights reserved
+        © UselessOS Comedy Engine • No Common Sense Found • All rights reserved
       </div>
     </div>
   );

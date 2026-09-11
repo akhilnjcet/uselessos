@@ -63,7 +63,7 @@ export const StartMenu = ({ onClose }) => {
           <div>
             <h3 className="font-bold text-sm text-slate-100">മലയാളി (Admin)</h3>
             <p className="text-[10px] text-amber-400 font-mono">
-              MalayaliOS Premium License
+              UselessOS Premium License
             </p>
           </div>
         </div>
@@ -142,7 +142,7 @@ export const StartMenu = ({ onClose }) => {
 
       {/* Footer Info */}
       <div className="pt-2 border-t border-slate-800/80 text-center text-[10px] text-slate-500 font-mono">
-        MalayaliOS™ • 100% Comedy Guaranteed
+        UselessOS™ • 100% Comedy Guaranteed
       </div>
 
       {/* Shutdown Confirmation Dialog */}
@@ -150,7 +150,7 @@ export const StartMenu = ({ onClose }) => {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
           <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-2xl">
             <h3 className="text-base font-bold text-slate-100">
-              Are you sure you want to shut down MalayaliOS?
+              Are you sure you want to shut down UselessOS?
             </h3>
             <p className="text-xs text-amber-300 font-medium italic">
               “ഇത്രയും നേരം ചുമ്മാ ഇരുന്നിട്ട് ഇപ്പോ shutdown ആണോ?”

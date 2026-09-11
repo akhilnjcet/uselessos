@@ -51,7 +51,7 @@ export const ShutdownScreen = () => {
         {!isOff ? (
           <div className="space-y-3">
             <h2 className="text-xl font-black text-amber-400">
-              Shutting down MalayaliOS...
+              Shutting down UselessOS...
             </h2>
             <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800 relative p-0.5">
               <div
@@ -65,14 +65,14 @@ export const ShutdownScreen = () => {
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-1">
               <h2 className="text-3xl font-black text-slate-200 tracking-wider">
-                MALAYALIOS IS OFF
+                USELESSOS IS OFF
               </h2>
               <p className="text-xs text-slate-400">
                 “ശരി... ഞാൻ ഇറങ്ങുവാ. നാളെ വീണ്ടും കാണാം.”
               </p>
             </div>
             <div className="pt-6 text-amber-400 text-xs font-bold animate-bounce">
-              ▶ Click anywhere to start MalayaliOS ⚡
+              ▶ Click anywhere to start UselessOS ⚡
             </div>
           </div>
         )}
