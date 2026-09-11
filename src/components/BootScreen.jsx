@@ -41,7 +41,7 @@ export const BootScreen = () => {
     const progressInterval = setInterval(() => {
       currentProgress += Math.floor(Math.random() * 8) + 3;
       
-      if (currentProgress >= 98 && currentProgress < 100) {
+      if (currentProgress >= 98) {
         currentProgress = 98;
         setProgress(98);
         setSpecialQuote("ഇനി എന്തിനാ ഇത്രയും പെട്ടെന്ന്?");
@@ -56,7 +56,7 @@ export const BootScreen = () => {
             setTimeout(() => setIsBooted(true), 600);
           }, 400);
         }, 1800);
-      } else if (currentProgress < 98) {
+      } else {
         setProgress(currentProgress);
       }
     }, 150);

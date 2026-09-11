@@ -13,10 +13,14 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Ensure public/audio/cache directory exists
+// Ensure public/audio/cache directory exists locally if writable
 const cacheDir = path.join(process.cwd(), 'public', 'audio', 'cache');
-if (!fs.existsSync(cacheDir)) {
-  fs.mkdirSync(cacheDir, { recursive: true });
+try {
+  if (!fs.existsSync(cacheDir)) {
+    fs.mkdirSync(cacheDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('[MalayaliOS TTS] Cache directory creation skipped (read-only environment)');
 }
 
 // Serve cached audio files as static assets
@@ -154,11 +158,19 @@ app.post('/api/tts', async (req, res) => {
     console.log(`[MalayaliOS TTS] Generating natural Malayalam audio for: "${text.slice(0, 30)}..." [Style: ${style}]`);
     const audioBuffer = await generateMalayalamTTS(text, style);
 
-    // Save to server cache
-    fs.writeFileSync(cacheFilePath, audioBuffer);
-    console.log(`[MalayaliOS TTS] Audio generated and cached successfully as ${hash}.mp3`);
+    // Save to server cache if disk write permissions are available
+    try {
+      if (fs.existsSync(cacheDir)) {
+        fs.writeFileSync(cacheFilePath, audioBuffer);
+      }
+    } catch (e) {
+      // Ignored for serverless environments with read-only file systems
+    }
 
-    return res.json({ success: true, audioUrl, cached: false });
+    const dataUri = `data:audio/mp3;base64,${audioBuffer.toString('base64')}`;
+    const returnUrl = process.env.VERCEL ? dataUri : audioUrl;
+
+    return res.json({ success: true, audioUrl: returnUrl, cached: false });
   } catch (err) {
     console.error('[MalayaliOS TTS] Generation error:', err.message);
     return res.status(500).json({ error: 'Failed to generate natural TTS audio', details: err.message });
@@ -303,8 +315,12 @@ app.post('/api/videos/add', (req, res) => {
   return res.json({ success: true, videos: customAddedVideosStore });
 });
 
-app.listen(PORT, () => {
-  console.log(`[MalayaliOS Server] Express backend running at http://localhost:${PORT}`);
-  pregenerateCommonDialogues();
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`[MalayaliOS Server] Express backend running at http://localhost:${PORT}`);
+    pregenerateCommonDialogues();
+  });
+}
+
+export default app;
 
