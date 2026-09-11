@@ -6,8 +6,8 @@
 ### Team Name: Useless Devs
 
 ### Team Members
-- Team Lead: VISAKH B - NJCET
-- Member 2: AKHIL N - NJCET
+- Team Lead: VISAKH B - JCET
+- Member 2: AKHIL N - JCET
 
 ### Project Description
 UselessOS is a full-featured, satirical, interactive Web Operating System built with React 19, Vite, Three.js, and TailwindCSS v4. Packed with hilarious meme applications, interactive 3D elements, retro desktop window management, Hand Gesture AI Bird Hunt, and unexpected chaotic behavior.
