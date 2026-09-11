@@ -53,7 +53,7 @@ export const StartMenu = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-14 left-3 w-80 sm:w-96 bg-slate-950/95 border border-slate-800 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] backdrop-blur-2xl z-[9500] p-4 flex flex-col gap-4 font-sans select-none animate-fadeIn border-amber-500/30">
+    <div className="fixed bottom-14 left-3 w-80 sm:w-96 max-w-[calc(100vw-24px)] max-h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar bg-slate-950/95 border border-slate-800 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] backdrop-blur-2xl z-[9500] p-4 flex flex-col gap-4 font-sans select-none animate-fadeIn border-amber-500/30">
       {/* User Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-800">
         <div className="flex items-center gap-3">

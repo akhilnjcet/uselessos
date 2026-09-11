@@ -55,63 +55,90 @@ export const Window = ({ windowData }) => {
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const resizeStartRef = useRef({ w: 0, h: 0, mouseX: 0, mouseY: 0 });
 
-  // Handle Dragging
-  const handleTitleMouseDown = (e) => {
+  // Handle Dragging (Mouse & Touch)
+  const startDragging = (clientX, clientY) => {
     if (isMaximized) return;
     focusWindow(id);
     isDraggingRef.current = true;
     dragOffsetRef.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
+      x: clientX - position.x,
+      y: clientY - position.y
     };
 
-    const handleMouseMove = (e) => {
+    const handleMove = (e) => {
       if (!isDraggingRef.current) return;
-      const nextX = Math.max(0, Math.min(window.innerWidth - 100, e.clientX - dragOffsetRef.current.x));
-      const nextY = Math.max(0, Math.min(window.innerHeight - 80, e.clientY - dragOffsetRef.current.y));
+      const curX = e.touches ? e.touches[0].clientX : e.clientX;
+      const curY = e.touches ? e.touches[0].clientY : e.clientY;
+      const nextX = Math.max(0, Math.min(window.innerWidth - 100, curX - dragOffsetRef.current.x));
+      const nextY = Math.max(0, Math.min(window.innerHeight - 80, curY - dragOffsetRef.current.y));
       updateWindowPosition(id, { x: nextX, y: nextY });
     };
 
-    const handleMouseUp = () => {
+    const handleEnd = () => {
       isDraggingRef.current = false;
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleEnd);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchmove', handleMove, { passive: true });
+    window.addEventListener('touchend', handleEnd);
   };
 
-  // Handle Resizing
-  const handleResizeMouseDown = (e) => {
-    e.stopPropagation();
+  const handleTitleMouseDown = (e) => startDragging(e.clientX, e.clientY);
+  const handleTitleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      startDragging(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  // Handle Resizing (Mouse & Touch)
+  const startResizing = (e, clientX, clientY) => {
+    if (e.stopPropagation) e.stopPropagation();
     if (isMaximized) return;
     focusWindow(id);
     isResizingRef.current = true;
     resizeStartRef.current = {
       w: size.width,
       h: size.height,
-      mouseX: e.clientX,
-      mouseY: e.clientY
+      mouseX: clientX,
+      mouseY: clientY
     };
 
-    const handleMouseMove = (e) => {
+    const handleMove = (e) => {
       if (!isResizingRef.current) return;
-      const deltaX = e.clientX - resizeStartRef.current.mouseX;
-      const deltaY = e.clientY - resizeStartRef.current.mouseY;
-      const nextW = Math.max(340, resizeStartRef.current.w + deltaX);
-      const nextH = Math.max(260, resizeStartRef.current.h + deltaY);
+      const curX = e.touches ? e.touches[0].clientX : e.clientX;
+      const curY = e.touches ? e.touches[0].clientY : e.clientY;
+      const deltaX = curX - resizeStartRef.current.mouseX;
+      const deltaY = curY - resizeStartRef.current.mouseY;
+      const minW = Math.min(300, window.innerWidth - 20);
+      const nextW = Math.max(minW, resizeStartRef.current.w + deltaX);
+      const nextH = Math.max(220, resizeStartRef.current.h + deltaY);
       updateWindowSize(id, { width: nextW, height: nextH });
     };
 
-    const handleMouseUp = () => {
+    const handleEnd = () => {
       isResizingRef.current = false;
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleEnd);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchmove', handleMove, { passive: true });
+    window.addEventListener('touchend', handleEnd);
+  };
+
+  const handleResizeMouseDown = (e) => startResizing(e, e.clientX, e.clientY);
+  const handleResizeTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      startResizing(e, e.touches[0].clientX, e.touches[0].clientY);
+    }
   };
 
   // Render Inner Application Component
@@ -192,6 +219,7 @@ export const Window = ({ windowData }) => {
       {/* OS Window Title Bar */}
       <div
         onMouseDown={handleTitleMouseDown}
+        onTouchStart={handleTitleTouchStart}
         onDoubleClick={() => toggleMaximizeWindow(id)}
         className={`h-11 px-4 flex items-center justify-between select-none cursor-move border-b transition-colors flex-shrink-0 ${
           isFocused
@@ -206,7 +234,7 @@ export const Window = ({ windowData }) => {
         </div>
 
         {/* Right Window Action Buttons */}
-        <div className="flex items-center gap-1.5" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1.5" onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
           <button
             onClick={() => minimizeWindow(id)}
             className="w-7 h-7 rounded-lg hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-100 transition-colors cursor-pointer"
@@ -240,9 +268,10 @@ export const Window = ({ windowData }) => {
       {!isMaximized && (
         <div
           onMouseDown={handleResizeMouseDown}
-          className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize flex items-center justify-center z-50 group"
+          onTouchStart={handleResizeTouchStart}
+          className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize flex items-center justify-center z-50 group"
         >
-          <div className="w-2 h-2 border-r-2 border-b-2 border-slate-500 group-hover:border-amber-400" />
+          <div className="w-2.5 h-2.5 border-r-2 border-b-2 border-slate-500 group-hover:border-amber-400" />
         </div>
       )}
     </div>

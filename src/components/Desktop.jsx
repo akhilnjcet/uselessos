@@ -161,7 +161,7 @@ export const Desktop = () => {
       <div className="absolute inset-0 bg-black/15 pointer-events-none z-[1]" />
 
       {/* Desktop Icons Grid Container */}
-      <div className="p-6 pt-12 sm:pt-14 grid grid-flow-col grid-rows-6 sm:grid-rows-5 auto-cols-max gap-4 sm:gap-6 z-10 relative">
+      <div className="p-3 sm:p-6 pt-10 sm:pt-14 flex flex-wrap content-start max-h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar gap-3 sm:gap-6 z-10 relative">
         {/* 1. Comedy Character Icons */}
         {characters.map((char) => (
           <div

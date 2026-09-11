@@ -35,11 +35,14 @@ export const ContextMenu = ({ x, y, onClose, onAddCustomFolder }) => {
     onClose();
   };
 
+  const posX = Math.max(10, Math.min(x, (typeof window !== 'undefined' ? window.innerWidth : 800) - 220));
+  const posY = Math.max(10, Math.min(y, (typeof window !== 'undefined' ? window.innerHeight : 600) - 260));
+
   return (
     <div
       onClick={(e) => e.stopPropagation()}
       className="fixed bg-slate-950/95 border border-slate-800 rounded-xl shadow-2xl backdrop-blur-2xl z-[9800] py-1.5 w-52 text-xs font-sans select-none animate-fadeIn border-amber-500/30"
-      style={{ left: `${x}px`, top: `${y}px` }}
+      style={{ left: `${posX}px`, top: `${posY}px` }}
     >
       <button
         onClick={handleRefresh}
