@@ -7,7 +7,7 @@ export const BirdHuntApp = () => {
   const videoRef = useRef(null);
 
   const [score, setScore] = useState(0);
-  const [speedMultiplier, setSpeedMultiplier] = useState(1.0);
+  const [speedMultiplier, setSpeedMultiplier] = useState(1.5);
   const [loading, setLoading] = useState(true);
   const [cameraError, setCameraError] = useState(null);
 
@@ -64,10 +64,9 @@ export const BirdHuntApp = () => {
         this.x = this.fromLeft ? -50 : canvasWidth + 50;
         this.y = Math.random() * (canvasHeight - 250) + 50;
 
-        // Dynamic speed scaling: starts slow (1.0x), increases continuously based on score
-        // Starts with base speed ~1.2 - 2.2 px/frame. Speed multiplier increases with score.
-        const currentMultiplier = Math.min(5.0, 1.0 + (currentScore / 20) * 0.3);
-        const baseSpeed = Math.random() * 1.0 + 1.2;
+        // Dynamic speed scaling: starts from minimum 1.5x, increases continuously based on score
+        const currentMultiplier = Math.min(5.0, 1.5 + (currentScore / 20) * 0.3);
+        const baseSpeed = Math.random() * 1.0 + 1.5; // Starts at minimum 1.5 speed
 
         this.speed = baseSpeed * currentMultiplier * (this.fromLeft ? 1 : -1);
         this.wingAngle = 0;
@@ -171,8 +170,8 @@ export const BirdHuntApp = () => {
           birds.splice(i, 1);
           setScore((prev) => {
             const nextScore = prev + 10;
-            // Update speed multiplier state
-            setSpeedMultiplier((1.0 + (nextScore / 20) * 0.3).toFixed(1));
+            // Update speed multiplier state starting from 1.5x minimum
+            setSpeedMultiplier((1.5 + (nextScore / 20) * 0.3).toFixed(1));
             return nextScore;
           });
           break;
