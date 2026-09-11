@@ -67,7 +67,7 @@ For Software:
 
 # Screenshots (Add at least 3)
 
-![Screenshot1](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/hero.png)
+![Screenshot1](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/src/assets/desktop.png)
 *UselessOS Desktop Environment with Draggable Windows & 3D Ambient Canvas*
 
 ![Screenshot2](https://raw.githubusercontent.com/akhilnjcet/uselessos/main/public/wallpaper.jpg)
