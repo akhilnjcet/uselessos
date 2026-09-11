@@ -108,6 +108,7 @@ export const Desktop = () => {
     { type: 'ammavanCall', title: 'Ammavan Call', icon: '📞', bg: 'from-green-700/80 to-emerald-900/80' },
     { type: 'computerCleaner', title: 'Cleaner', icon: '🧹', bg: 'from-cyan-600/80 to-teal-800/80' },
     { type: 'astroTalk', title: 'Astro Talk', icon: '🔮', bg: 'from-purple-800/80 to-indigo-900/80' },
+    { type: 'birdHunt', title: 'Bird Hunt', icon: '🦅', bg: 'from-sky-600/80 to-teal-700/80' },
     { type: 'settings', title: 'Settings', icon: '⚙️', bg: 'from-slate-600/80 to-slate-800/80' }
   ];
 

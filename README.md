@@ -53,6 +53,7 @@ UselessOS comes pre-installed with a wide suite of essential (and non-essential)
 | 🌧️ **Rain & Night Sky** | Ambient relaxation tools for stargazing and soundscapes. |
 | 🤖 **Useless AI** | An AI chatbot specifically fine-tuned to give hilariously unhelpful answers. |
 | 🎭 **Troll Center & Character** | Meme collections and character interactions inspired by pop culture. |
+| 🦅 **Bird Hunt** | AI hand-gesture tracked bird shooting game using webcam index fingertip aiming and pinch firing. |
 | 📁 **File Manager & Browser** | Mock file browser and web surfer with built-in joke content. |
 | ⚙️ **Settings & Video Player** | OS customization controls and video playback integration. |
 

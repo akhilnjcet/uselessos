@@ -23,6 +23,7 @@ import { FindMyChargerApp } from './apps/FindMyChargerApp';
 import { AmmavanCallApp } from './apps/AmmavanCallApp';
 import { ComputerCleanerApp } from './apps/ComputerCleanerApp';
 import { AstroTalkApp } from './apps/AstroTalkApp';
+import { BirdHuntApp } from './apps/BirdHuntApp';
 
 export const Window = ({ windowData }) => {
   const {
@@ -158,6 +159,8 @@ export const Window = ({ windowData }) => {
         return <ComputerCleanerApp />;
       case 'astroTalk':
         return <AstroTalkApp />;
+      case 'birdHunt':
+        return <BirdHuntApp />;
       default:
         return (
           <div className="p-6 text-slate-300 font-sans">

@@ -27,6 +27,7 @@ export const StartMenu = ({ onClose }) => {
     { type: 'ammavanCall', title: '📞 Ammavan Call', icon: '📞', desc: 'Incoming Comedy Call' },
     { type: 'computerCleaner', title: '🧹 Cleaner', icon: '🧹', desc: 'Junk & Meme Cleaner' },
     { type: 'astroTalk', title: '🔮 Astro Talk', icon: '🔮', desc: 'Malayalam Comedy Astrology' },
+    { type: 'birdHunt', title: '🦅 Bird Hunt', icon: '🦅', desc: 'AI Hand Gesture Shooting Game' },
     { type: 'settings', title: '⚙️ Settings', icon: '⚙️', desc: 'Themes & Playlist Config' }
   ];
 
