@@ -99,47 +99,71 @@ export const Desktop = () => {
     return defaults;
   });
 
-  // Keep shortcuts synced with character/folder updates
+  // Keep shortcuts synced with character/folder updates without resetting user custom order
   useEffect(() => {
     const defaults = getDefaultShortcuts(characters, customFolders);
     setShortcuts((prev) => {
-      const map = new Map(prev.map((item) => [item.id, item]));
-      const updated = defaults.map((item) => map.get(item.id) || item);
-      return updated;
+      const defaultIds = new Set(defaults.map((d) => d.id));
+      const defaultMap = new Map(defaults.map((d) => [d.id, d]));
+
+      // 1. Keep existing items in user's custom order, updating properties
+      const existing = prev
+        .filter((item) => defaultIds.has(item.id))
+        .map((item) => ({ ...defaultMap.get(item.id), ...item }));
+
+      // 2. Append any brand new items not yet in prev
+      const existingIds = new Set(existing.map((item) => item.id));
+      const brandNew = defaults.filter((item) => !existingIds.has(item.id));
+
+      return [...existing, ...brandNew];
     });
   }, [characters, customFolders]);
 
   // Persist shortcut order in localStorage
   useEffect(() => {
-    const orderIds = shortcuts.map((s) => s.id);
-    localStorage.setItem('malayaliOS_app_shortcuts_order', JSON.stringify(orderIds));
+    if (shortcuts.length > 0) {
+      const orderIds = shortcuts.map((s) => s.id);
+      localStorage.setItem('malayaliOS_app_shortcuts_order', JSON.stringify(orderIds));
+    }
   }, [shortcuts]);
 
   // --- Drag and Drop Handlers for Shortcuts ---
   const handleDragStart = (e, index) => {
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
     wasDraggedRef.current = true;
     setDraggedIndex(index);
   };
 
-  const handleDragEnter = (e, index) => {
+  const handleDragOver = (e, index) => {
     e.preventDefault();
-    if (draggedIndex !== null && draggedIndex !== index) {
+    e.dataTransfer.dropEffect = 'move';
+    if (draggedIndex !== null && draggedIndex !== index && dragOverIndex !== index) {
       setDragOverIndex(index);
     }
   };
 
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
+    const sourceIdxStr = e.dataTransfer.getData('text/plain');
+    const sourceIdx = draggedIndex !== null ? draggedIndex : parseInt(sourceIdxStr, 10);
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    if (isNaN(sourceIdx) || sourceIdx < 0 || sourceIdx >= shortcuts.length || sourceIdx === targetIndex) {
+      return;
+    }
 
     const newShortcuts = [...shortcuts];
-    const [draggedItem] = newShortcuts.splice(draggedIndex, 1);
+    const [draggedItem] = newShortcuts.splice(sourceIdx, 1);
     newShortcuts.splice(targetIndex, 0, draggedItem);
 
     setShortcuts(newShortcuts);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+
+    const orderIds = newShortcuts.map((s) => s.id);
+    localStorage.setItem('malayaliOS_app_shortcuts_order', JSON.stringify(orderIds));
+
     playSound('click');
     addNotification('Shortcuts Rearranged', `Moved "${draggedItem.title}" to position ${targetIndex + 1}. 📌`, '📍');
   };
@@ -149,7 +173,7 @@ export const Desktop = () => {
     setDragOverIndex(null);
     setTimeout(() => {
       wasDraggedRef.current = false;
-    }, 100);
+    }, 120);
   };
 
   const handleShortcutClick = (shortcut) => {
@@ -305,28 +329,28 @@ export const Desktop = () => {
               key={app.id}
               draggable
               onDragStart={(e) => handleDragStart(e, idx)}
-              onDragEnter={(e) => handleDragEnter(e, idx)}
-              onDragOver={(e) => e.preventDefault()}
+              onDragEnter={(e) => handleDragOver(e, idx)}
+              onDragOver={(e) => handleDragOver(e, idx)}
               onDrop={(e) => handleDrop(e, idx)}
               onDragEnd={handleDragEnd}
               onClick={() => handleShortcutClick(app)}
-              className={`group w-20 sm:w-24 p-2 rounded-2xl flex flex-col items-center text-center gap-1.5 cursor-grab active:cursor-grabbing hover:bg-black/40 transition-all duration-200 backdrop-blur-md border ${
+              className={`group w-20 sm:w-24 p-2 rounded-2xl flex flex-col items-center text-center gap-1.5 cursor-grab active:cursor-grabbing hover:bg-black/40 transition-all duration-200 backdrop-blur-md border select-none ${
                 isTargetOver
-                  ? 'border-2 border-amber-400 scale-110 shadow-2xl bg-amber-500/30 ring-4 ring-amber-400/40 animate-pulse'
+                  ? 'border-2 border-amber-400 scale-110 shadow-2xl bg-amber-500/40 ring-4 ring-amber-400/50 animate-pulse'
                   : isBeingDragged
                   ? 'opacity-40 scale-95 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]'
                   : 'border-white/10 hover:border-amber-400/50 shadow-xl'
               }`}
             >
               <div
-                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${
+                className={`pointer-events-none w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${
                   app.avatarBg ? '' : `bg-gradient-to-br ${app.bg || 'from-slate-700/80 to-slate-900/80'}`
                 } flex items-center justify-center text-2xl sm:text-3xl shadow-xl group-hover:scale-110 transition-transform border border-white/30`}
                 style={app.avatarBg ? { background: app.avatarBg } : {}}
               >
                 {app.icon}
               </div>
-              <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
+              <span className="pointer-events-none text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
                 {app.title}
               </span>
             </div>
