@@ -13,7 +13,8 @@ UselessOS is a full-featured, satirical, interactive Web Operating System built 
 ### Team Name: UselessOS Team
 
 ### Team Members
-- **Team Lead**: Akhil - NJCET
+- **Team Lead**: VISAKH B
+- member   :AKHIL N
 
 ### Project Description
 UselessOS is a web-based desktop environment packed with absurd, funny, and satirical applications inspired by Indian/Malayalam pop culture, tech tropes, and anti-productivity humor.
